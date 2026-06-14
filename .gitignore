@@ -1,0 +1,35 @@
+# OS generated files
+.DS_Store*
+.Spotlight-V100
+.Trashes
+._*
+ehthumbs.db
+Thumbs.db
+
+# IDE
+.claude
+.idea
+.private
+.vscode
+
+# Others
+.dev/
+.run/
+bench/results/
+bin/
+dist/
+out/
+tmp/
+
+# downflate build output + local secrets
+/downflate
+talosconfig
+
+# Preserve files
+!.gitkeep
+
+# Go test + profiling artifacts (go test -c binaries, coverage, pprof)
+*.test
+*.out
+*.prof
+*.pprof
