@@ -109,7 +109,10 @@ func (p *Puller) PullAll(ctx context.Context, refs []string) []Result {
 // pull streams a single image pull to completion on one node. The machinery
 // Pull RPC is server-streaming; the pull is complete once the stream closes.
 func (p *Puller) pull(ctx context.Context, node, ref string) error {
-	nctx := client.WithNodes(ctx, node)
+	// WithNode (singular) targets a single node directly; WithNodes (plural)
+	// engages apid's one-to-many proxying, which Talos rejects for the streaming
+	// ImageService/Pull RPC.
+	nctx := client.WithNode(ctx, node)
 	stream, err := p.client.ImageClient.Pull(nctx, &machine.ImageServicePullRequest{
 		Containerd: &common.ContainerdInstance{
 			Driver:    p.driver,
