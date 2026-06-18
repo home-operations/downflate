@@ -60,7 +60,7 @@ All configuration is via environment variables.
 | `DOWNFLATE_TIMEOUT` | — | `15m` | Per-PR render+pull deadline |
 | `DOWNFLATE_CONCURRENCY` | — | `2` | Max PRs (and pulls) processed in parallel |
 | `DOWNFLATE_RESTRICT_EGRESS` | — | `false` | Enable flate's SSRF guard (set for untrusted/fork PRs) |
-| `DOWNFLATE_STATUS_CONTEXT` | — | `downflate` | Commit-status context label |
+| `DOWNFLATE_STATUS_CONTEXT` | — | `Downflate` | Commit-status context label |
 | `DOWNFLATE_CACHE_DIR` | — | flate default | flate on-disk source cache |
 | `DOWNFLATE_ADDR` | — | `:8080` | HTTP listen address |
 | `DOWNFLATE_LOG_LEVEL` | — | `info` | `debug`/`info`/`warn`/`error` |

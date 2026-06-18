@@ -5,6 +5,7 @@ import (
 	"context"
 	"fmt"
 	"log/slog"
+	"strings"
 	"sync"
 	"time"
 
@@ -139,7 +140,7 @@ func (s *Server) process(parent context.Context, ev webhook.Event) {
 	}
 
 	images := render.Changed(res.Base, res.Head)
-	nodes := len(s.puller.Nodes())
+	nodes := s.puller.Nodes()
 	if len(images) == 0 {
 		log.Info("no changed images", "render_failures", res.Failures)
 		s.setStatus(ctx, ev, provider.Success, statusDesc(res.Failures, 0, 0, nodes))
@@ -184,7 +185,7 @@ func (s *Server) setStatus(parent context.Context, ev webhook.Event, state provi
 	}
 }
 
-func statusDesc(renderFailures, images, pullFailures, nodes int) string {
+func statusDesc(renderFailures, images, pullFailures int, nodes []string) string {
 	switch {
 	case images == 0:
 		if renderFailures > 0 {
@@ -192,10 +193,18 @@ func statusDesc(renderFailures, images, pullFailures, nodes int) string {
 		}
 		return "no image changes"
 	case pullFailures > 0:
-		return fmt.Sprintf("%d/%d pulls failed across %d nodes", pullFailures, images*nodes, nodes)
+		return fmt.Sprintf("%d/%d pulls failed on %s", pullFailures, images*len(nodes), strings.Join(nodes, ", "))
 	default:
-		return fmt.Sprintf("pre-pulled %d images across %d nodes", images, nodes)
+		return fmt.Sprintf("pre-pulled %s on %s", count(images, "image"), strings.Join(nodes, ", "))
 	}
+}
+
+// count renders a pluralized "N noun" phrase ("1 image", "3 images").
+func count(n int, noun string) string {
+	if n == 1 {
+		return "1 " + noun
+	}
+	return fmt.Sprintf("%d %ss", n, noun)
 }
 
 func short(sha string) string {

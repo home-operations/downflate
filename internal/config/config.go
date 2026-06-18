@@ -71,7 +71,7 @@ func Load() (*Config, error) {
 		Talosconfig:   envOr("DOWNFLATE_TALOSCONFIG", "/var/run/secrets/talos.dev/config"),
 		TalosContext:  os.Getenv("DOWNFLATE_TALOS_CONTEXT"),
 		Namespace:     strings.ToLower(envOr("DOWNFLATE_IMAGE_NAMESPACE", "cri")),
-		StatusContext: envOr("DOWNFLATE_STATUS_CONTEXT", "downflate"),
+		StatusContext: envOr("DOWNFLATE_STATUS_CONTEXT", "Downflate"),
 		LogFormat:     strings.ToLower(envOr("DOWNFLATE_LOG_FORMAT", "text")),
 	}
 
