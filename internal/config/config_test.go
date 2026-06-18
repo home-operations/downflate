@@ -49,10 +49,10 @@ func TestGitHubAppConfigured(t *testing.T) {
 	if (&Config{}).GitHubAppConfigured() {
 		t.Error("empty config should not be App-configured")
 	}
-	if (&Config{GitHubAppID: 1}).GitHubAppConfigured() {
+	if (&Config{GitHubAppClientID: "Iv1.abc123"}).GitHubAppConfigured() {
 		t.Error("app id without key should not be App-configured")
 	}
-	if !(&Config{GitHubAppID: 1, GitHubAppPrivateKey: []byte("k")}).GitHubAppConfigured() {
+	if !(&Config{GitHubAppClientID: "Iv1.abc123", GitHubAppPrivateKey: []byte("k")}).GitHubAppConfigured() {
 		t.Error("app id + key should be App-configured")
 	}
 }

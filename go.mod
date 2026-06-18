@@ -4,10 +4,10 @@ go 1.26.4
 
 require (
 	codeberg.org/mvdkleijn/forgejo-sdk/forgejo/v3 v3.0.0
-	github.com/bradleyfalzon/ghinstallation/v2 v2.19.0
 	github.com/go-git/go-git/v5 v5.19.1
+	github.com/golang-jwt/jwt/v5 v5.3.1
 	github.com/google/go-github/v88 v88.0.0
-	github.com/home-operations/flate v0.4.7
+	github.com/home-operations/flate v0.4.8
 	github.com/siderolabs/talos/pkg/machinery v1.13.4
 	gitlab.com/gitlab-org/api/client-go/v2 v2.39.0
 )
@@ -59,7 +59,7 @@ require (
 	github.com/fluxcd/pkg/apis/kustomize v1.19.0 // indirect
 	github.com/fluxcd/pkg/apis/meta v1.30.0 // indirect
 	github.com/fluxcd/pkg/envsubst v1.7.0 // indirect
-	github.com/fluxcd/pkg/kustomize v1.34.0 // indirect
+	github.com/fluxcd/pkg/kustomize v1.35.0 // indirect
 	github.com/fluxcd/pkg/sourceignore v0.18.0 // indirect
 	github.com/fluxcd/source-controller/api v1.8.5 // indirect
 	github.com/fxamacker/cbor/v2 v2.9.2 // indirect
@@ -90,7 +90,6 @@ require (
 	github.com/go-viper/mapstructure/v2 v2.5.0 // indirect
 	github.com/gobwas/glob v0.2.3 // indirect
 	github.com/gofrs/flock v0.13.0 // indirect
-	github.com/golang-jwt/jwt/v4 v4.5.2 // indirect
 	github.com/golang/groupcache v0.0.0-20241129210726-2c02b8208cf8 // indirect
 	github.com/google/btree v1.1.3 // indirect
 	github.com/google/cel-go v0.28.1 // indirect

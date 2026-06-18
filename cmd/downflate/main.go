@@ -48,13 +48,13 @@ func run() error {
 	var appClient *http.Client
 	gitToken := func(context.Context) (string, error) { return cfg.Token, nil }
 	if cfg.GitHubAppConfigured() {
-		app, err := githubapp.New(ctx, cfg)
+		app, err := githubapp.New(cfg)
 		if err != nil {
 			return err
 		}
 		appClient = app.HTTPClient()
 		gitToken = app.Token
-		slog.Info("using github app authentication", "app_id", cfg.GitHubAppID)
+		slog.Info("using github app authentication", "client_id", cfg.GitHubAppClientID)
 	}
 
 	writer, err := provider.New(cfg, appClient)
