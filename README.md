@@ -48,11 +48,10 @@ All configuration is via environment variables.
 |---|---|---|---|
 | `DOWNFLATE_REPO` | ✓ | — | Forge URI: `github://owner/repo`, `gitlab://gitlab.example.com/group/sub/project`, `forgejo://git.example.com/owner/repo` |
 | `DOWNFLATE_TOKEN` | ✓* | — | Forge API token (commit-status write + private clone). *Optional if a GitHub App is configured. |
-| `DOWNFLATE_TALOSCONFIG` | ✓ | — | Path to a talosconfig (mTLS creds + endpoints) |
+| `DOWNFLATE_TALOSCONFIG` | — | `/var/run/secrets/talos.dev/config` | Path to a talosconfig (mTLS creds + endpoints) |
 | `DOWNFLATE_WEBHOOK_SECRET` | — | — | HMAC/token secret; **`/hooks` returns `501` until set** |
-| `DOWNFLATE_GITHUB_APP_ID` | — | — | GitHub App ID — enables App auth (GitHub only) |
+| `DOWNFLATE_GITHUB_APP_CLIENT_ID` | — | — | GitHub App **client ID** — enables App auth (GitHub only) |
 | `DOWNFLATE_GITHUB_APP_PRIVATE_KEY` | — | — | App private key: PEM inline, or `@/path/to/key.pem` |
-| `DOWNFLATE_GITHUB_APP_INSTALLATION_ID` | — | auto | App installation ID (auto-discovered from the repo if unset) |
 | `DOWNFLATE_CLUSTER_PATH` | — | repo root | Sub-path flate scans (e.g. `kubernetes`) |
 | `DOWNFLATE_NODES` | — | talosconfig nodes/endpoints | Comma-separated node addresses to pull onto |
 | `DOWNFLATE_IMAGE_NAMESPACE` | — | `cri` | `cri` (k8s workloads) or `system` |
@@ -74,10 +73,12 @@ works on all three forges — it needs commit-status write (`repo:status` on
 GitHub) and read access to clone the repo.
 
 On GitHub you can instead use a **GitHub App** (the konflate model). Set
-`DOWNFLATE_GITHUB_APP_ID` and `DOWNFLATE_GITHUB_APP_PRIVATE_KEY`; downflate
-discovers the repository installation and mints short-lived installation tokens
-used for **both** the commit-status API and the git clone, so no static PAT is
-needed. The App needs *Commit statuses: write* and *Contents: read* permissions.
+`DOWNFLATE_GITHUB_APP_CLIENT_ID` (the App's client ID) and
+`DOWNFLATE_GITHUB_APP_PRIVATE_KEY`; downflate signs an App JWT with the client ID
+as issuer, discovers the repository installation, and mints short-lived
+installation tokens used for **both** the commit-status API and the git clone, so
+no static PAT is needed. The App needs *Commit statuses: write* and
+*Contents: read* permissions.
 (GitHub Apps are only required for *check runs*, which downflate does not use —
 plain commit statuses work with either auth method.)
 

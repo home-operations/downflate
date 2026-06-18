@@ -34,12 +34,12 @@ type Config struct {
 	Token         string // forge API token (commit-status write)
 	WebhookSecret string // HMAC secret; empty disables /hooks
 
-	// GitHub App auth (GitHub only, optional). When set, downflate mints
-	// short-lived installation tokens for both the status API and git clone,
-	// instead of using Token. InstallationID 0 ⇒ auto-discover from the repo.
-	GitHubAppID             int64
-	GitHubAppInstallationID int64
-	GitHubAppPrivateKey     []byte
+	// GitHub App auth (GitHub only, optional). When the App's client id and
+	// private key are set, downflate mints short-lived installation tokens for
+	// both the status API and git clone instead of using Token. The installation
+	// is resolved automatically from the repo.
+	GitHubAppClientID   string
+	GitHubAppPrivateKey []byte
 
 	ClusterPath string // path inside the repo flate scans (e.g. "kubernetes")
 	CacheDir    string // flate on-disk source cache (empty ⇒ flate default)
@@ -68,7 +68,7 @@ func Load() (*Config, error) {
 		WebhookSecret: os.Getenv("DOWNFLATE_WEBHOOK_SECRET"),
 		ClusterPath:   os.Getenv("DOWNFLATE_CLUSTER_PATH"),
 		CacheDir:      os.Getenv("DOWNFLATE_CACHE_DIR"),
-		Talosconfig:   os.Getenv("DOWNFLATE_TALOSCONFIG"),
+		Talosconfig:   envOr("DOWNFLATE_TALOSCONFIG", "/var/run/secrets/talos.dev/config"),
 		TalosContext:  os.Getenv("DOWNFLATE_TALOS_CONTEXT"),
 		Namespace:     strings.ToLower(envOr("DOWNFLATE_IMAGE_NAMESPACE", "cri")),
 		StatusContext: envOr("DOWNFLATE_STATUS_CONTEXT", "downflate"),
@@ -83,13 +83,9 @@ func Load() (*Config, error) {
 		}
 	}
 
+	c.GitHubAppClientID = os.Getenv("DOWNFLATE_GITHUB_APP_CLIENT_ID")
+
 	var err error
-	if c.GitHubAppID, err = int64Or("DOWNFLATE_GITHUB_APP_ID", 0); err != nil {
-		return nil, err
-	}
-	if c.GitHubAppInstallationID, err = int64Or("DOWNFLATE_GITHUB_APP_INSTALLATION_ID", 0); err != nil {
-		return nil, err
-	}
 	if err = c.loadAppPrivateKey(os.Getenv("DOWNFLATE_GITHUB_APP_PRIVATE_KEY")); err != nil {
 		return nil, err
 	}
@@ -114,26 +110,23 @@ func Load() (*Config, error) {
 	if c.Namespace != "cri" && c.Namespace != "system" {
 		return nil, fmt.Errorf("DOWNFLATE_IMAGE_NAMESPACE must be \"cri\" or \"system\", got %q", c.Namespace)
 	}
-	if c.Talosconfig == "" {
-		return nil, fmt.Errorf("DOWNFLATE_TALOSCONFIG is required")
+	// A GitHub App credential needs both halves, is GitHub-only, and makes Token
+	// optional.
+	if (c.GitHubAppClientID == "") != (len(c.GitHubAppPrivateKey) == 0) {
+		return nil, fmt.Errorf("GitHub App auth needs both DOWNFLATE_GITHUB_APP_CLIENT_ID and DOWNFLATE_GITHUB_APP_PRIVATE_KEY (only one is set)")
 	}
-	if c.GitHubAppID != 0 {
-		if c.Forge != ForgeGitHub {
-			return nil, fmt.Errorf("DOWNFLATE_GITHUB_APP_ID is only valid for a github:// repo")
-		}
-		if len(c.GitHubAppPrivateKey) == 0 {
-			return nil, fmt.Errorf("DOWNFLATE_GITHUB_APP_PRIVATE_KEY is required with DOWNFLATE_GITHUB_APP_ID")
-		}
+	if c.GitHubAppConfigured() && c.Forge != ForgeGitHub {
+		return nil, fmt.Errorf("GitHub App auth is only valid for a github:// repo")
 	}
 	if c.Token == "" && !c.GitHubAppConfigured() {
-		return nil, fmt.Errorf("DOWNFLATE_TOKEN or GitHub App credentials (DOWNFLATE_GITHUB_APP_ID + DOWNFLATE_GITHUB_APP_PRIVATE_KEY) are required")
+		return nil, fmt.Errorf("DOWNFLATE_TOKEN or GitHub App credentials (DOWNFLATE_GITHUB_APP_CLIENT_ID + DOWNFLATE_GITHUB_APP_PRIVATE_KEY) are required")
 	}
 	return c, nil
 }
 
 // GitHubAppConfigured reports whether GitHub App credentials are present.
 func (c *Config) GitHubAppConfigured() bool {
-	return c.GitHubAppID != 0 && len(c.GitHubAppPrivateKey) > 0
+	return c.GitHubAppClientID != "" && len(c.GitHubAppPrivateKey) > 0
 }
 
 // loadAppPrivateKey reads the App private key from an inline PEM value or, when
@@ -226,18 +219,6 @@ func intOr(key string, def int) (int, error) {
 		return def, nil
 	}
 	n, err := strconv.Atoi(v)
-	if err != nil {
-		return 0, fmt.Errorf("%s: %w", key, err)
-	}
-	return n, nil
-}
-
-func int64Or(key string, def int64) (int64, error) {
-	v := os.Getenv(key)
-	if v == "" {
-		return def, nil
-	}
-	n, err := strconv.ParseInt(v, 10, 64)
 	if err != nil {
 		return 0, fmt.Errorf("%s: %w", key, err)
 	}
