@@ -9,7 +9,7 @@ require (
 	github.com/google/go-github/v88 v88.0.0
 	github.com/home-operations/flate v0.4.10
 	github.com/siderolabs/talos/pkg/machinery v1.13.5
-	gitlab.com/gitlab-org/api/client-go/v2 v2.43.0
+	gitlab.com/gitlab-org/api/client-go/v2 v2.44.0
 )
 
 require (
