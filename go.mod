@@ -9,7 +9,7 @@ require (
 	github.com/google/go-github/v88 v88.0.0
 	github.com/home-operations/flate v0.4.10
 	github.com/siderolabs/talos/pkg/machinery v1.13.5
-	gitlab.com/gitlab-org/api/client-go/v2 v2.44.0
+	gitlab.com/gitlab-org/api/client-go/v2 v2.51.0
 )
 
 require (
@@ -92,7 +92,7 @@ require (
 	github.com/gofrs/flock v0.13.0 // indirect
 	github.com/golang/groupcache v0.0.0-20241129210726-2c02b8208cf8 // indirect
 	github.com/google/btree v1.1.3 // indirect
-	github.com/google/cel-go v0.28.1 // indirect
+	github.com/google/cel-go v0.29.2 // indirect
 	github.com/google/gnostic-models v0.7.1 // indirect
 	github.com/google/go-querystring v1.2.0 // indirect
 	github.com/google/uuid v1.6.0 // indirect
